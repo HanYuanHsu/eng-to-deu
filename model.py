@@ -1,6 +1,15 @@
 import os
 import openai
 
+import math
+import torch
+from torch import nn, Tensor
+from torch.nn import TransformerEncoder, TransformerEncoderLayer
+from torch.utils.data import dataset
+
+MAX_LEN = 20000 # the maximal number of characters that a sentence can have as the input of
+# the transformer model
+
 class NoKeyError(Exception):
     pass
 
@@ -31,5 +40,44 @@ def gpt_eng_to_deu(eng_sentence):
 
 
     return response.choices[0]['message']['content']
+
+
+# https://pytorch.org/tutorials/beginner/transformer_tutorial.html
+class PositionalEncoding(nn.Module):
+    def __init__(self, d_model: int, dropout: float = 0.1, max_len: int = MAX_LEN):
+        # d_model: the embedding dimension 
+        super().__init__()
+        self.dropout = nn.Dropout(p=dropout)
+
+        position = torch.arange(max_len).unsqueeze(1)
+        div_term = torch.exp(torch.arange(0, d_model, 2) * (-math.log(10000.0) / d_model))
+        pe = torch.zeros(max_len, 1, d_model)
+        pe[:, 0, 0::2] = torch.sin(position * div_term) # 0::2 means step size = 2
+        pe[:, 0, 1::2] = torch.cos(position * div_term) # the sines and cosines are alternating
+        # recall the postional embedding formulas in the CS 182 slides
+        self.register_buffer('pe', pe)
+
+    def forward(self, x: Tensor) -> Tensor:
+        """
+        Arguments:
+            x: Tensor, shape ``[seq_len, batch_size, embedding_dim]``
+        """
+        seq_len = x.size(0) 
+        assert seq_len <= MAX_LEN
+
+        x = x + self.pe[:seq_len] # :seq_len is a slicing operation that selects the first 5 elements along the first dimension of the tensor.
+        return self.dropout(x)
+    
+
+
+
+#######################
+if __name__ == '__main__':
+    seq_len = 100
+    batch_size = 32
+    embedding_dim = 128
+    x = torch.randint(0, 128, size=(seq_len, batch_size, embedding_dim))
+    pe = PositionalEncoding(d_model=embedding_dim)
+    print(pe(x).shape)
 
 

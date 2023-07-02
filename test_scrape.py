@@ -16,6 +16,11 @@ Association football is the most popular sport in Norway in terms of active memb
             </a>
 '''
 def test1():
-    return remove_tags(content1)
+    return clean(content1)
 
-print(test1())
+def test2():
+    for p in scrape_wiki('food'):
+        print(p)
+        print('----------')
+
+test2()
