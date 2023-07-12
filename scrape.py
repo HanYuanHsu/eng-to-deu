@@ -23,7 +23,8 @@ def clean(text):
 def scrape_wiki(item):
     # item: search item
     # will then scrape from base_url + item
-    # returns a 
+    # to see how to use this function,
+    # run test2() in test_scrape.py
 
     response = requests.get(base_url + item)
     soup = BeautifulSoup(response.content, "html.parser")
@@ -47,6 +48,11 @@ def scrape_wiki(item):
 
 
 def generate_data():
+    # from the paragraphs returned by scrape_wiki,
+    # I want to pick a random word w and then
+    # call scrape_wiki(w) to generate another
+    # set of paragraphs
+
     for p in scrape_wiki('Norway'):
         de = gpt_eng_to_deu(p)
 

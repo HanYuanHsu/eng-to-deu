@@ -2,6 +2,7 @@ import torch
 import math
 import unittest
 from utils import *
+from model import *
 
 def test1():
     max_len = 50
@@ -25,7 +26,13 @@ def test_positional_encoding():
                           111, 117, 114, 32, 112, 108, 97, 110, 
                           115, 32, 116, 111, 100, 97, 121, 63])
     
+    input_indices = torch.Tensor(input_indices)
+    pe = PositionalEncoding(d_model=128)
     
+
+    print()
+    
+
 
 
 if __name__ == '__main__':

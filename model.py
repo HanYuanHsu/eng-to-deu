@@ -7,6 +7,8 @@ from torch import nn, Tensor
 from torch.nn import TransformerEncoder, TransformerEncoderLayer
 from torch.utils.data import dataset
 
+from utils import *
+
 MAX_LEN = 20000 # the maximal number of characters that a sentence can have as the input of
 # the transformer model
 
@@ -21,6 +23,7 @@ else:
 
 ROLE_DESCRIPTION = "You are a native English and German speaker. Given the English sentence, translate it into German."
 
+# also try https://libretranslate.com/
 def gpt_eng_to_deu(eng_sentence): 
 
     msg=[
@@ -62,22 +65,49 @@ class PositionalEncoding(nn.Module):
         Arguments:
             x: Tensor, shape ``[seq_len, batch_size, embedding_dim]``
         """
-        seq_len = x.size(0) 
+        seq_len = x.size(0)
         assert seq_len <= MAX_LEN
 
-        x = x + self.pe[:seq_len] # :seq_len is a slicing operation that selects the first 5 elements along the first dimension of the tensor.
+        x = x + self.pe[:seq_len] # :seq_len is a slicing operation that selects the first seq_len elements along the first dimension of the tensor.
         return self.dropout(x)
     
 
-
-
-#######################
-if __name__ == '__main__':
+def test1():
     seq_len = 100
     batch_size = 32
     embedding_dim = 128
     x = torch.randint(0, 128, size=(seq_len, batch_size, embedding_dim))
     pe = PositionalEncoding(d_model=embedding_dim)
-    print(pe(x).shape)
+    print(pe(x).shape) # torch.Size([100, 32, 128])
+
+def test2():
+    #x = torch.Tensor([[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]])
+    x = torch.Tensor([[[1, 2], [3, 4]], [[5, 6], [7, 8]]])
+    pe = PositionalEncoding(d_model=2)
+    print(pe(x))
+    '''
+    tensor([[[1.1111, 3.3333],
+         [3.3333, 5.5556]],
+
+        [[6.4905, 0.0000],
+         [8.7127, 9.4892]]])
+    '''
+
+def test3():
+    input = "Hello world."
+    print([char_to_index(c) for c in input])
+        
+
+
+
+
+#######################
+# document positional encoding
+#
+#
+if __name__ == '__main__':
+    test3()
+
+
 
 
